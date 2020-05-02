@@ -1,27 +1,24 @@
-version: 2
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
 jobs:
   build-and-test:
-    docker:
-    - image: circleci/python:latest
+    executor: python/default
     steps:
-    - checkout
-    - restore_cache:
-        keys:
-        - pip-{{ checksum "requirements.txt"  }}
-    - run:
-        command: |
-          make install
-        name: Install Dependencies
-    - save_cache:
-        key: pip-{{ checksum "requirements.txt"  }}
-        paths:
-        - /home/circleci/.local/lib/
-    - run:
-        command: make lint
-        name: Test
+      - checkout
+      - python/load-cache
+      - python/install-deps
+      - python/save-cache
+      - run:
+          command: make install
+          name: install
+      - run:
+          command: make lint
+          name: Test
+
 workflows:
   main:
     jobs:
-    - build-and-test
-  version: 2
-
+      - build-and-test

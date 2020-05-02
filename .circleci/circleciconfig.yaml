@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build-and-test:
+    docker:
+    - image: circleci/python:latest
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - pip-{{ checksum "requirements.txt"  }}
+    - run:
+        command: |
+          make install
+        name: Install Dependencies
+    - save_cache:
+        key: pip-{{ checksum "requirements.txt"  }}
+        paths:
+        - /home/circleci/.local/lib/
+    - run:
+        command: make lint
+        name: Test
+workflows:
+  main:
+    jobs:
+    - build-and-test
+  version: 2
+
